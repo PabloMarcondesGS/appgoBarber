@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import api from '../../services/api';
 
 import getValidationErrors from '../../ultils/getValidationErrors';
 
@@ -48,17 +49,21 @@ const SignUp: React.FC = () => {
             const schema = Yup.object().shape({
                 name: Yup.string().required('Nome obrigatório'),
                 email: Yup.string().required('E-mail obrigatorio').email('Digite um e-mail valido'),
-                password: Yup.string().min(3, 'Minimo de 3 caracteres'),
+                password: Yup.string().min(3, 'Minimo de 3 caracteres').required('Senha obrigatoria'),
             });
 
             await schema.validate(data, {
                 abortEarly: false,
             });
 
-            // Alert.alert(
-            //     'Cadastro realizado!',
-            //     'Você já pode fazer seu login'
-            // )
+            await api.post('/users', data)
+
+            Alert.alert(
+                'Cadastro realizado com sucesso!',
+                'Você já pode logar na aplicação'
+            )
+
+            navigation.goBack();
 
         } catch (err) {
             if (err instanceof Yup.ValidationError){
@@ -73,7 +78,7 @@ const SignUp: React.FC = () => {
                 'Ocorreu um erro ao fazer cadastro, tente novamente'
             );
         }
-    }, []);
+    }, [navigation]);
 
     return (
         <>
